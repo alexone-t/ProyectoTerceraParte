@@ -6,6 +6,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ControllerAdvice
 @Configuration
@@ -27,7 +29,12 @@ public class GlobalExceptionHandler implements WebMvcConfigurer {
     public String handleException(Exception ex, Model model) {
         model.addAttribute("error", "Ocurrió un error inesperado");
         return "error/general";
-
     }
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry){
+        registry.addResourceHandler("/css/**")
+                .addResourceLocations("classpath:/static/css/");
+        }
+
 }
 

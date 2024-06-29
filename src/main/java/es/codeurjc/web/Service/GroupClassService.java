@@ -129,9 +129,10 @@ public class GroupClassService {
         }
 
         if(!groupClass.maxCapacityReached()){
+            user.getListOfClasses().add(groupClass);
             groupClass.addClassUser(user);
 
-            user.getListOfClasses().add(groupClass);
+
             userRepository.save(user);
 
             groupClassRepository.save(groupClass);

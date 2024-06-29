@@ -102,8 +102,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/loginerror").permitAll()
-                        .requestMatchers("/h2-console").permitAll()
-
+                        .requestMatchers("/h2-console/**").permitAll()
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")

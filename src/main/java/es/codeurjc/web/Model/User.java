@@ -17,9 +17,9 @@ public class User {
     @Id @JsonView(Basic.class)
     private Long userid;
     @JsonView(Basic.class)
-    private String name;
-    @JsonView(Basic.class)
     private String username;
+    @JsonView(Basic.class)
+    private String name;
     @JsonIgnore
     private String encodedPassword;
     @ElementCollection(fetch = FetchType.EAGER)
@@ -39,7 +39,7 @@ public class User {
 
 
     public User(){}
-    public User(String name, String username,String encodedPassword, String... roles) {
+    public User(String username, String name,String encodedPassword, String... roles) {
         this.name = name;
         this.username = username;
         this.encodedPassword = encodedPassword;
@@ -53,10 +53,10 @@ public class User {
     public void setUserid(Long userid){this.userid = userid;}
 
 
-    public String getName(){return name;}
-    public void setName(String name){this.name = name;}
+    public String getName(){return username;}
+    public void setName(String name){this.username = name;}
     public String getUsername(){return this.username;}
-    public void setUsername(String username){this.username = name;}
+    public void setUsername(String username){this.username = username;}
 
     public List<GroupClass> getListOfClasses(){
         return this.listOfClasses;

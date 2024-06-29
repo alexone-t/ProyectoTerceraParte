@@ -190,7 +190,9 @@ public class GroupClassWebController {
     }
     private Long getUserIdFromPrincipal(Principal principal) {
 
-        return Long.parseLong(principal.getName());
+        Optional <User> user = userService.findByUsername(principal.getName());
+
+        return user.get().getUserid();
     }
     @ModelAttribute
     public void addAttributes(Model model, HttpServletRequest request) {
@@ -201,6 +203,7 @@ public class GroupClassWebController {
 
             model.addAttribute("logged", true);
             String name = principal.getName();
+            System.out.println(name);
             Optional<User> userOptional = userService.findByUsername(name);
             User user = userOptional.get();
             model.addAttribute("user", user);

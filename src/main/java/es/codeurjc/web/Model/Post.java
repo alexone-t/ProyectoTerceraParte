@@ -62,8 +62,8 @@ public class Post {
     }
     public void setCreator(User creator){this.creator = creator;}
     public User getCreator(){return this.creator;}
-    public void setCreatorName(String creatorName){this.creator.setName(creatorName);}
-    public String getCreatorName(){return this.creator.getName();}
+    public void setCreatorName(String creatorName){this.creator.setUsername(creatorName);}
+    public String getCreatorName(){return this.creator.getUsername();}
     public String getImage(){return this.image;}
 
     public void setImage(String image){ this.image = image; }
