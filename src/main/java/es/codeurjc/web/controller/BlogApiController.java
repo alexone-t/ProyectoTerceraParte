@@ -1,4 +1,4 @@
-package es.codeurjc.web.controller;
+/*package es.codeurjc.web.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import es.codeurjc.web.Model.User;
@@ -218,4 +218,4 @@ public class BlogApiController {
             return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
         }
     }
-}
+}*/

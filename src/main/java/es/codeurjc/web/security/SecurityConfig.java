@@ -89,6 +89,13 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(authorize -> authorize
+
+                        // PRIVATE PAGES
+                        .requestMatchers("/GroupClasses/*").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/GroupClasses/*/JoinClass-*").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/GroupClasses/*/JoinClassConfirmation-*").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/GroupClasses/*/LeaveClass-*").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/GroupClasses/*/LeaveClassConfirmation-*").hasAnyRole("USER","ADMIN")
                         // PUBLIC PAGES
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/css/*").permitAll()
@@ -96,9 +103,6 @@ public class SecurityConfig {
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/loginerror").permitAll()
                         .requestMatchers("/h2-console").permitAll()
-                        // PRIVATE PAGES
-                        .requestMatchers("/GroupClasses/*").hasAnyRole("USER","ADMIN")
-                        .requestMatchers("/GroupClasses/*/JoinClass-*").hasRole("")
 
                 )
                 .formLogin(formLogin -> formLogin

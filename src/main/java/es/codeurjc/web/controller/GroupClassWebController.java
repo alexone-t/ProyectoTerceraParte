@@ -1,6 +1,5 @@
 package es.codeurjc.web.controller;
 import es.codeurjc.web.exceptions.ResourceNotFoundException;
-import es.codeurjc.web.exceptions.UnauthorizedException;
 
 import es.codeurjc.web.Model.User;
 import es.codeurjc.web.Model.GroupClass;
@@ -8,6 +7,7 @@ import es.codeurjc.web.Service.GroupClassService;
 import es.codeurjc.web.Service.UserService;
 import es.codeurjc.web.Service.ValidateService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -123,18 +123,18 @@ public class GroupClassWebController {
         }
     }
     @PostMapping("/GroupClasses/{name}/JoinClassConfirmation-{id}")
-    public String joinClassProcess(Model model, @PathVariable String name, @RequestParam Long userId, @PathVariable Long id, Principal principal) throws IOException {
+    public String joinClassProcess(Model model, @PathVariable String name, @RequestParam Long userId, @PathVariable Long id,HttpServletRequest request) throws IOException {
 
         name = validateService.cleanInput(name);
-
+        Principal principal = request.getUserPrincipal();
         if (principal == null) {
-            throw new UnauthorizedException("El usuario no está autenticado");
+            return "redirect:/login";
         }
 
         Long loggedInUserId = getUserIdFromPrincipal(principal);
 
         if (!loggedInUserId.equals(userId)) {
-            throw new UnauthorizedException("No tienes permiso para unirte a esta clase");
+            return "redirect:/login";
         }
 
         Optional<GroupClass> groupClassOpt = groupClassService.findById(id);
@@ -143,7 +143,6 @@ public class GroupClassWebController {
         }
 
         groupClassService.joinClass(userId,id);
-
         return "redirect:/GroupClasses/{name}/{id}";
     }
 
@@ -164,13 +163,13 @@ public class GroupClassWebController {
         name = validateService.cleanInput(name);
 
         if (principal == null) {
-            throw new UnauthorizedException("El usuario no está autenticado");
+            //throw new UnauthorizedException("El usuario no está autenticado");
         }
 
         Long loggedInUserId = getUserIdFromPrincipal(principal);
 
         if (!loggedInUserId.equals(userId)) {
-            throw new UnauthorizedException("No tienes permiso para salir de esta clase");
+            //throw new UnauthorizedException("No tienes permiso para salir de esta clase");
         }
 
         Optional<GroupClass> groupClassOpt = groupClassService.findById(id);
@@ -192,5 +191,23 @@ public class GroupClassWebController {
     private Long getUserIdFromPrincipal(Principal principal) {
 
         return Long.parseLong(principal.getName());
+    }
+    @ModelAttribute
+    public void addAttributes(Model model, HttpServletRequest request) {
+
+        Principal principal = request.getUserPrincipal();
+
+        if (principal != null) {
+
+            model.addAttribute("logged", true);
+            String name = principal.getName();
+            Optional<User> userOptional = userService.findByUsername(name);
+            User user = userOptional.get();
+            model.addAttribute("user", user);
+            model.addAttribute("admin", request.isUserInRole("ADMIN"));
+
+        } else {
+            model.addAttribute("logged", false);
+        }
     }
 }

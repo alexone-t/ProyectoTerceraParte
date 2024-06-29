@@ -29,9 +29,9 @@ public class DatabaseInitializer {
 
     @PostConstruct
     public void init()throws IOException{
-        users.save(new User("user1",passwordEncoder.encode("pass1"), "USER"));
-        users.save(new User("user2",passwordEncoder.encode("pass2"), "USER"));
-        users.save(new User("admin",passwordEncoder.encode("adminpass"), "USER","ADMIN"));
+        users.save(new User("Manolo","user1",passwordEncoder.encode("pass1"), "USER"));
+        users.save(new User("Paco","user2",passwordEncoder.encode("pass2"), "USER"));
+        users.save(new User("Miguel","admin",passwordEncoder.encode("adminpass"), "USER","ADMIN"));
 
         //Create group class
         GroupClass class1 = new GroupClass("Advanced yoga", "Monday", "10:00", "Professor A", 20);

@@ -25,7 +25,7 @@
         <td>{{currentCapacity}}/{{maxCapacity}}</td>
     </tr>
     {{/GroupClass}}
-    <form action="'/GroupClasses/{name}/JoinClassConfirmation-{{id}}'" method="post">
+    <form action="/GroupClasses/{{GroupClass.name}}/JoinClassConfirmation-{{id}}" method="post">
         <input type="hidden" name="userId" value="1">
         <button type="submit">Unirse a la Clase</button>
     </form>
