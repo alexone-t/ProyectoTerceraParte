@@ -1,7 +1,7 @@
-package es.codeurjc.web.Controller;
+package es.codeurjc.web.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import es.codeurjc.web.Model.ClassUser;
+import es.codeurjc.web.Model.User;
 
 import es.codeurjc.web.Model.GroupClass;
 import es.codeurjc.web.Service.GroupClassService;
@@ -31,14 +31,14 @@ public class GroupClassApiController {
     @Autowired
     private ValidateService validateService;
 
-    interface GroupClassDetails extends GroupClass.Basic, GroupClass.Users, ClassUser.Basic{}
+    interface GroupClassDetails extends GroupClass.Basic, GroupClass.Users, User.Basic{}
 
     /////////////////GET(all)/////////////////
 
     @JsonView(GroupClassDetails.class)
     @GetMapping("/")
     public Collection<GroupClass> getGroupClasses() {
-        return apiGroupClassService.findAll();
+        return apiGroupClassService.findAllForIndex();
     }
 
     ////////////////GET(ByType)////////////////

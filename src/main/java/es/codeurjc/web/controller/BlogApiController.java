@@ -1,13 +1,12 @@
-package es.codeurjc.web.Controller;
+package es.codeurjc.web.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import es.codeurjc.web.Model.ClassUser;
+import es.codeurjc.web.Model.User;
 import es.codeurjc.web.Model.Post;
 import es.codeurjc.web.Service.ImageService;
 import es.codeurjc.web.Service.PostService;
 import es.codeurjc.web.Service.UserService;
 import es.codeurjc.web.Service.ValidateService;
-import org.springframework.core.io.UrlResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,13 +15,9 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.core.io.Resource;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.sql.Blob;
 import java.util.*;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,7 +42,7 @@ public class BlogApiController {
     private ImageService imageService;
     @Autowired
     private ValidateService validateService;
-    interface PostsDetails extends Post.Basic, Post.Creator, ClassUser.Basic{}
+    interface PostsDetails extends Post.Basic, Post.Creator, User.Basic{}
 
     /////////////////GET(all)/////////////////
     @JsonView(Post.Basic.class)

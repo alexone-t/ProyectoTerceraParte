@@ -1,15 +1,13 @@
 package es.codeurjc.web.Service;
 
-import es.codeurjc.web.Model.ClassUser;
+import es.codeurjc.web.Model.User;
 import es.codeurjc.web.Model.GroupClass;
 import es.codeurjc.web.Model.Post;
-import es.codeurjc.web.repository.ClassUserRepository;
+import es.codeurjc.web.repository.UserRepository;
 import es.codeurjc.web.repository.GroupClassRepository;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class UserService {
 
     @Autowired
-    private ClassUserRepository classUserRepository;
+    private UserRepository userRepository;
 
 
     @Autowired
@@ -43,11 +41,11 @@ public class UserService {
     private Long classUserId;
 
 
-    public List<ClassUser>findAll(){return classUserRepository.findAll();}
+    public List<User>findAll(){return userRepository.findAll();}
 
 
     @SuppressWarnings("unchecked")
-    public Iterable<ClassUser>findAll(String name){
+    public Iterable<User>findAll(String name){
         String query = "SELECT * FROM classUser";
         if(name != null){
             query+=" WHERE name= " + name;
@@ -55,17 +53,17 @@ public class UserService {
         if(!query.startsWith("SELECT")){
             query = query.substring(5);
         }
-        return (List<ClassUser>) entityManager.createNativeQuery(query, ClassUser.class).getResultList();
+        return (List<User>) entityManager.createNativeQuery(query, User.class).getResultList();
     }
 
 
-    public ClassUser findUserById(long id){return classUserRepository.findById(id).orElseThrow();}
+    public User findUserById(long id){return userRepository.findById(id).orElseThrow();}
 
 
-    public boolean exist(long id){return classUserRepository.existsById(id);}
+    public boolean exist(long id){return userRepository.existsById(id);}
 
 
-    public Optional<ClassUser> findById(long id){
+    public Optional<User> findById(long id){
 
         if(this.exist(id)){
             return Optional.of(this.findUserById(id));
@@ -75,59 +73,60 @@ public class UserService {
     }
 
 
-    public ClassUser save(ClassUser classUser){
+    public User save(User user){
 
         long id = nextId.getAndIncrement();
-        classUser.setUserid(id);
-        classUserRepository.save(classUser);
-        return classUser;
+        user.setUserid(id);
+        userRepository.save(user);
+        return user;
 
     }
 
 
-    public void delete(long id){classUserRepository.deleteById(id);}
+    public void delete(long id){
+        userRepository.deleteById(id);}
 
 
     public void addPost(Post post, Long UserId){
 
-        ClassUser classUser = classUserRepository.findById(UserId).orElseThrow(); //error en newpost
-        List <Post> posts = classUser.getListOfPosts();
+        User user = userRepository.findById(UserId).orElseThrow(); //error en newpost
+        List <Post> posts = user.getListOfPosts();
         posts.add(post);
-        classUser.setListOfPosts(posts);
-        classUserRepository.save(classUser);
+        user.setListOfPosts(posts);
+        userRepository.save(user);
 
     }
 
 
     public void removePost(long postId, long classUserId){
 
-        ClassUser classUser = classUserRepository.findById(classUserId).orElseThrow();
-        List <Post> posts = classUser.getListOfPosts();
+        User user = userRepository.findById(classUserId).orElseThrow();
+        List <Post> posts = user.getListOfPosts();
         posts.remove(postService.findById(postId).get());
-        classUser.setListOfPosts(posts);
-        classUserRepository.save(classUser);
+        user.setListOfPosts(posts);
+        userRepository.save(user);
 
     }
 
 
     public void addGroupClass(GroupClass groupClass, long classUserId){
 
-        ClassUser classUser = classUserRepository.findById(classUserId).orElseThrow();
-        List <GroupClass> groupClasses = classUser.getListOfClasses();
+        User user = userRepository.findById(classUserId).orElseThrow();
+        List <GroupClass> groupClasses = user.getListOfClasses();
         groupClasses.add(groupClass);
-        classUser.setListOfClasses(groupClasses);
-        classUserRepository.save(classUser);
+        user.setListOfClasses(groupClasses);
+        userRepository.save(user);
 
     }
 
 
     public void removeGroupClass(long groupClassId, long classUserId){
 
-        ClassUser classUser = classUserRepository.findById(classUserId).orElseThrow();
-        List <GroupClass> groupClasses = classUser.getListOfClasses();
+        User user = userRepository.findById(classUserId).orElseThrow();
+        List <GroupClass> groupClasses = user.getListOfClasses();
         groupClasses.remove(groupClassService.findById(groupClassId).get());
-        classUser.setListOfClasses(groupClasses);
-        classUserRepository.save(classUser);
+        user.setListOfClasses(groupClasses);
+        userRepository.save(user);
 
     }
 

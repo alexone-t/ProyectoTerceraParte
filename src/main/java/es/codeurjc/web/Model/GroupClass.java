@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Entity
@@ -28,22 +27,19 @@ public class GroupClass {
     private int maxCapacity;
     @JsonView(Basic.class)
     private int currentCapacity;
-    @JsonView(Basic.class)
-    private boolean officialClass;
-    private boolean alreadyJoined;
 
     public interface Users{}
 
     @ManyToMany(cascade=CascadeType.MERGE)
     @JsonView(Users.class)
-    private List<ClassUser> usersList = new ArrayList<>();
+    private List<User> usersList = new ArrayList<>();
 
 
 
 
     public GroupClass(){}
 
-    public GroupClass(String name, String day, String time, String instructor, int maxCapacity,boolean officialClass) {
+    public GroupClass(String name, String day, String time, String instructor, int maxCapacity) {
         super();
         this.name = name;
         this.day = day;
@@ -52,8 +48,6 @@ public class GroupClass {
         this.maxCapacity = maxCapacity;
         this.currentCapacity = 0;
         this.usersList = new ArrayList<>();
-        this.alreadyJoined = false;
-        this.officialClass = officialClass;
     }
 
     public Long getId() {return classid;}
@@ -110,22 +104,20 @@ public class GroupClass {
         return this.currentCapacity >= this.maxCapacity;
     }
 
+    public List<User> getClassUsers(){return this.usersList;}
+    public void setClassUsers(List<User> users){this.usersList = users;}
 
-    public boolean getAlreadyJoined(){return this.alreadyJoined;}
-    public void setAlreadyJoined(boolean joined){this.alreadyJoined = joined;}
-
-
-    public boolean getOfficialClass(){return this.officialClass;}
-    public void setOfficialClass(boolean officialClass){this.officialClass = officialClass;}
-
-
-    public List<ClassUser> getClassUsers(){return this.usersList;}
-    public void setClassUsers(List<ClassUser> classUsers){this.usersList = classUsers;}
-
-
+    public void addClassUser(User user){
+        this.usersList.add(user);
+        this.setCurrentCapacity(this.getCurrentCapacity()+1);
+    }
+    public void removeClassUser(User user){
+        this.usersList.remove(user);
+        this.setCurrentCapacity(this.getCurrentCapacity()-1);
+    }
     @Override
     public String toString() {
-        return "Class [name=" + name + ", day=" + day + ", time=" + time + ", instructor=" + instructor + ", maxCapacity=" + maxCapacity + ", currentCapacity=" + currentCapacity + ", officialClass=" + officialClass + "]";
+        return "Class [name=" + name + ", day=" + day + ", time=" + time + ", instructor=" + instructor + ", maxCapacity=" + maxCapacity + ", currentCapacity=" + currentCapacity + "]";
     }
 
 

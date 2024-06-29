@@ -1,21 +1,15 @@
 package es.codeurjc.web.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
-import java.sql.Blob;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-public class ClassUser {
+@Entity(name = "USERS")
+public class User {
 
     public interface Basic {}
 
@@ -24,28 +18,29 @@ public class ClassUser {
     private Long userid;
     @JsonView(Basic.class)
     private String name;
-
+    @JsonIgnore
+    private String encodedPassword;
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles;
 
 
     public interface Posts{}
-
-
     @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
     @JsonView(Posts.class)
     private List<Post> listOfPosts = new ArrayList<>();
 
 
     public interface GroupClasses{}
-
-
     @JsonView(GroupClasses.class)
     @ManyToMany(cascade=CascadeType.MERGE)
     private List<GroupClass> listOfClasses = new ArrayList<>();
 
 
-    public ClassUser(){}
-    public ClassUser(String name){
+    public User(){}
+    public User(String name, String encodedPassword, String... roles) {
         this.name = name;
+        this.encodedPassword = encodedPassword;
+        this.roles = List.of(roles);
         this.listOfClasses = new ArrayList<>();
         this.listOfPosts = new ArrayList<>();
     }
@@ -69,5 +64,20 @@ public class ClassUser {
     public void setListOfPosts(List<Post>posts){this.listOfPosts = posts;}
 
     public void addPost(Post post){this.listOfPosts.add(post);}
+    public String getEncodedPassword() {
+        return encodedPassword;
+    }
+
+    public void setEncodedPassword(String encodedPassword) {
+        this.encodedPassword = encodedPassword;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
 
 }

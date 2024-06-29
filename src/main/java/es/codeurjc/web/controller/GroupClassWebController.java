@@ -1,7 +1,8 @@
-package es.codeurjc.web.Controller;
-import jakarta.servlet.http.HttpSession;
+package es.codeurjc.web.controller;
+import es.codeurjc.web.exceptions.ResourceNotFoundException;
+import es.codeurjc.web.exceptions.UnauthorizedException;
 
-import es.codeurjc.web.Model.ClassUser;
+import es.codeurjc.web.Model.User;
 import es.codeurjc.web.Model.GroupClass;
 import es.codeurjc.web.Service.GroupClassService;
 import es.codeurjc.web.Service.UserService;
@@ -13,7 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,8 +30,7 @@ public class GroupClassWebController {
 
     @GetMapping("/")
     public String showGroupClasses(Model model) {
-        model.addAttribute("GroupClasses", groupClassService.findAll(true, null, null));
-        model.addAttribute("ImagineClass", groupClassService.findAll(false, null, null));
+        model.addAttribute("GroupClasses", groupClassService.findAllForIndex(null, null));
         return "index";
     }
 
@@ -54,14 +54,13 @@ public class GroupClassWebController {
             model.addAttribute("error", validationError);
             return "newClassPage";
         } else {
-            groupClass.setOfficialClass(false);
             groupClassService.save(groupClass);
             return "redirect:/GroupClasses/" + groupClass.getName() + "/" + groupClass.getId();
         }
     }
 
     @GetMapping("/GroupClasses/{name}/{id}")
-    public String showClass(Model model, @PathVariable String name, @PathVariable long id, HttpSession session) {
+    public String showClass(Model model, @PathVariable String name, @PathVariable long id) {
         Optional<GroupClass> optionalGroupClass = groupClassService.findById(id);
         if (optionalGroupClass.isPresent()) {
             GroupClass groupClass = optionalGroupClass.get();
@@ -104,8 +103,8 @@ public class GroupClassWebController {
     }
 
     @GetMapping("/GroupClasses/{name}")
-    public String showGroupClass(Model model, @PathVariable String name, HttpSession session) {
-        List<GroupClass> listOfClasses = groupClassService.findAll(null, name, null);
+    public String showGroupClass(Model model, @PathVariable String name) {
+        List<GroupClass> listOfClasses = groupClassService.findAllForIndex(name, null);
         model.addAttribute("GroupClass", listOfClasses);
         for (GroupClass groupClass : listOfClasses) {
             model.addAttribute("isMaxCapacityReached", groupClass.maxCapacityReached());
@@ -123,6 +122,30 @@ public class GroupClassWebController {
             return "index";
         }
     }
+    @PostMapping("/GroupClasses/{name}/JoinClassConfirmation-{id}")
+    public String joinClassProcess(Model model, @PathVariable String name, @RequestParam Long userId, @PathVariable Long id, Principal principal) throws IOException {
+
+        name = validateService.cleanInput(name);
+
+        if (principal == null) {
+            throw new UnauthorizedException("El usuario no está autenticado");
+        }
+
+        Long loggedInUserId = getUserIdFromPrincipal(principal);
+
+        if (!loggedInUserId.equals(userId)) {
+            throw new UnauthorizedException("No tienes permiso para unirte a esta clase");
+        }
+
+        Optional<GroupClass> groupClassOpt = groupClassService.findById(id);
+        if (!groupClassOpt.isPresent()) {
+            throw new ResourceNotFoundException("Clase no encontrada");
+        }
+
+        groupClassService.joinClass(userId,id);
+
+        return "redirect:/GroupClasses/{name}/{id}";
+    }
 
     @GetMapping("/GroupClasses/{name}/LeaveClass-{id}")
     public String leaveClass(Model model, @PathVariable Long id) {
@@ -135,44 +158,28 @@ public class GroupClassWebController {
         }
     }
 
-    @PostMapping("/GroupClasses/{name}/LeaveClass-{id}")
-    public String leaveClassProcess(Model model, @PathVariable String name, @PathVariable Long id) {
+    @PostMapping("/GroupClasses/{name}/LeaveClassConfirmation-{id}")
+    public String leaveClassProcess(Model model, @PathVariable String name, @PathVariable Long id, @RequestParam Long userId, Principal principal )throws IOException {
 
         name = validateService.cleanInput(name);
 
-        GroupClass groupClass = groupClassService.findById(id).orElse(null);
-        if (groupClass != null) {
-            List<ClassUser> listOfUsers = groupClass.getClassUsers();
-            ClassUser userWithHighestId = listOfUsers.get(0);
-            for (ClassUser user : listOfUsers) {
-                if (user.getUserid() > userWithHighestId.getUserid()) {
-                    userWithHighestId = user;
-                }
-            }
-            groupClassService.removeUser(userWithHighestId.getUserid(), id);
-            userService.delete(userWithHighestId.getUserid());
-            groupClass.setAlreadyJoined(false);
-            groupClass.setCurrentCapacity(groupClass.getCurrentCapacity() - 1);
+        if (principal == null) {
+            throw new UnauthorizedException("El usuario no está autenticado");
         }
+
+        Long loggedInUserId = getUserIdFromPrincipal(principal);
+
+        if (!loggedInUserId.equals(userId)) {
+            throw new UnauthorizedException("No tienes permiso para salir de esta clase");
+        }
+
+        Optional<GroupClass> groupClassOpt = groupClassService.findById(id);
+        if (!groupClassOpt.isPresent()) {
+            throw new ResourceNotFoundException("Clase no encontrada");
+        }
+
+        groupClassService.joinClass(userId,id);
         return "redirect:/GroupClasses/{name}";
-    }
-
-    @PostMapping("/GroupClasses/{name}/JoinClass-{id}")
-    public String joinClassProcess(Model model, @PathVariable String name, @RequestParam String username, @PathVariable Long id) throws IOException {
-
-        username = validateService.cleanInput(username);
-
-        ClassUser user = new ClassUser(username);
-        Optional<GroupClass> optionalGroupClass = groupClassService.findById(id);
-        if (optionalGroupClass.isPresent()) {
-            GroupClass groupClass = optionalGroupClass.get();
-            groupClass.setAlreadyJoined(true);
-            user.getListOfClasses().add(groupClass);
-            groupClassService.addUser(user, groupClass.getId());
-            userService.save(user);
-            groupClassService.save(groupClass);
-        }
-        return "redirect:/GroupClasses/{name}/{id}";
     }
 
     @GetMapping("/GroupClasses/find")
@@ -181,5 +188,9 @@ public class GroupClassWebController {
         model.addAttribute("GroupClass", groupClassService.dinamicQuerie(day,instructor));
 
         return "class";
+    }
+    private Long getUserIdFromPrincipal(Principal principal) {
+
+        return Long.parseLong(principal.getName());
     }
 }

@@ -1,9 +1,11 @@
 package es.codeurjc.web.Service;
 
 
-import es.codeurjc.web.Model.ClassUser;
+import es.codeurjc.web.Model.User;
 import es.codeurjc.web.Model.GroupClass;
+import es.codeurjc.web.exceptions.ResourceNotFoundException;
 import es.codeurjc.web.repository.GroupClassRepository;
+import es.codeurjc.web.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -22,7 +24,8 @@ public class GroupClassService {
     @Autowired
     private GroupClassRepository groupClassRepository;
 
-
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private EntityManager entityManager;
 
@@ -30,25 +33,21 @@ public class GroupClassService {
     @Autowired
     private UserService userService;
 
-    /*@Autowired
-    private ValidateService validateService;*/
+    @Autowired
+    private ValidateService validateService;
 
 
     private AtomicLong nextId = new AtomicLong(1L);
 
-    public List<GroupClass> findAll(){return groupClassRepository.findAll();}
+    public List<GroupClass> findAllForIndex(){return groupClassRepository.findAll();}
 
     //no tocar :)
-    public List<GroupClass> findAll(Boolean official,String name, String time) {
+    public List<GroupClass> findAllForIndex(String name, String time) {
 
         StringBuilder queryBuilder = new StringBuilder("SELECT g FROM GroupClass g");
         List<String> conditions = new ArrayList<>();
         Map<String, Object> parameters = new HashMap<>();
 
-        if (official != null) {
-            conditions.add("g.officialClass = :official");
-            parameters.put("official", official);
-        }
         if (name != null) {
             conditions.add("g.name = :name");
             parameters.put("name", name);
@@ -101,29 +100,43 @@ public class GroupClassService {
         groupClassRepository.save(groupClass);
     }
 
-    public void addUser(ClassUser user, long groupClassId){
-        GroupClass groupClass = groupClassRepository.findById(groupClassId).orElseThrow();
-        List <ClassUser> users = groupClass.getClassUsers();
-        users.add(user);
-        groupClass.setClassUsers(users);
+    public void leaveClass(Long userId, Long classId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        GroupClass groupClass = groupClassRepository.findById(classId)
+                .orElseThrow(() -> new ResourceNotFoundException("Clase de grupo no encontrada"));
+        if (!groupClass.getClassUsers().contains(user)) {
+            throw new IllegalArgumentException("El usuario ya está no esta inscrito en esta clase");
+        }
+        user.getListOfClasses().remove(groupClass);
+
+        groupClass.removeClassUser(user);
+
+        userRepository.save(user);
         groupClassRepository.save(groupClass);
     }
 
-    public void removeUser(long userId, long groupClassId){
-        GroupClass groupClass = groupClassRepository.findById(groupClassId).orElseThrow();
-        List <ClassUser> users = groupClass.getClassUsers();
-        users.remove(userService.findById(userId).get());
-        groupClass.setClassUsers(users);
-        groupClassRepository.save(groupClass);
-    }
+    public void joinClass(Long userId, Long classId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-    /*public Object findByType(String type) {
-        TypedQuery<GroupClass> query = entityManager.createQuery(
-                "SELECT g FROM GroupClass g WHERE g.type = :type", GroupClass.class
-        );
-        query.setParameter("type", type);
-        return query.getResultList();
-    }*/
+        GroupClass groupClass = groupClassRepository.findById(classId)
+                .orElseThrow(() -> new ResourceNotFoundException("Clase de grupo no encontrada"));
+
+        if (groupClass.getClassUsers().contains(user)) {
+            throw new IllegalArgumentException("El usuario ya está inscrito en esta clase");
+        }
+
+        if(!groupClass.maxCapacityReached()){
+            groupClass.addClassUser(user);
+
+            user.getListOfClasses().add(groupClass);
+            userRepository.save(user);
+
+            groupClassRepository.save(groupClass);
+        }
+    }
 
     public List<GroupClass> findByCriteria(Boolean official, String name, String time) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();

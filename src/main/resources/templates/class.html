@@ -3,12 +3,12 @@
 <head>
     <title>Class</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="css/join_class.css">
+    <link rel="stylesheet" type="text/css" href="/css/join_class.css">
 </head>
 <body>
 
 <h1>Classes of {{name}}: </h1>
-
+<p>Find other class</p>
 <form method="get" enctype="multipart/form-data">
     <p><label>Select day: </label></p>
     <select name="day">
@@ -70,14 +70,6 @@
 
 <button onclick="window.location.href='/'" class="btn back-btn">Back</button>
 
-{{#GroupClass}}
-{{^officialClass}}
 
-<button onclick="window.location.href='/GroupClasses/EditClass/{{classid}}'" class="btn edit-btn">Edit</button>
-
-<button onclick="window.location.href='/GroupClasses/DeleteClass/{{classid}}'" class="btn delete-btn">Delete</button>
-
-{{/officialClass}}
-{{/GroupClass}}
 </body>
 </html>

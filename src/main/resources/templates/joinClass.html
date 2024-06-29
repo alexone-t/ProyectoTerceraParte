@@ -3,7 +3,7 @@
 <head>
     <title>Join Class</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="css/join_class.css">
+    <link rel="stylesheet" type="text/css" href="/css/join_class.css">
 </head>
 <body>
 <h1>Are you sure you want to join this class:</h1>
@@ -25,20 +25,12 @@
         <td>{{currentCapacity}}/{{maxCapacity}}</td>
     </tr>
     {{/GroupClass}}
-    <form action="/GroupClasses/{{GroupClass.name}}/JoinClass-{{id}}" method="post" enctype="multipart/form-data">
-        <h1>Enter username</h1>
-        <div>
-            <label>Username: </label>
-            <input name="username" placeholder="username" required/>
-        </div>
-        <div>
-            <input type="hidden" name="id" value="{{GroupClass.classid}}">
-        </div>
-        <div>
-            <button type="submit">Join</button>
-        </div>
-        <button onclick="location.href='/GroupClasses/{{GroupClass.name}}';return false;">Back</button>
+    <form action="'/GroupClasses/{name}/JoinClassConfirmation-{{id}}'" method="post">
+        <input type="hidden" name="userId" value="1">
+        <button type="submit">Unirse a la Clase</button>
     </form>
+    <button onclick="location.href='/GroupClasses/{{GroupClass.name}}'">Back</button>
+
     </tbody>
 </table>
 </body>

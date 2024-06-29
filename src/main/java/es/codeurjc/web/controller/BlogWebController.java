@@ -1,5 +1,5 @@
-package es.codeurjc.web.Controller;
-import es.codeurjc.web.Model.ClassUser;
+/*package es.codeurjc.web.controller;
+import es.codeurjc.web.Model.User;
 import es.codeurjc.web.Model.Post;
 import es.codeurjc.web.Service.ImageService;
 import es.codeurjc.web.Service.PostService;
@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,12 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+
 @Controller
 public class BlogWebController {
 
@@ -78,7 +75,7 @@ public class BlogWebController {
     @PostMapping("/blog/new")
     public String newPostProcess(Model model, Post post, MultipartFile imagefile, String user) throws IOException {
 
-        ClassUser classUser = new ClassUser(user);
+        User classUser = new User(user);
         post.setCreator(classUser);
 
         if(validateService.validatePost(post) != null){
@@ -111,7 +108,7 @@ public class BlogWebController {
     public String editPostProcess(@PathVariable long id, Model model, Post post, MultipartFile imagefile,
                                   String user,@RequestParam boolean deleteImage) throws IOException{
 
-        ClassUser classUser = new ClassUser(user);
+        User classUser = new User(user);
         post.setCreator(classUser);
 
         if(validateService.validatePost(post) != null){
@@ -148,4 +145,4 @@ public class BlogWebController {
     }
 
 
-}
+}*/

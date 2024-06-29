@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
-import es.codeurjc.web.Model.ClassUser;
+import es.codeurjc.web.Model.User;
 import es.codeurjc.web.repository.PostRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -55,7 +55,7 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    public List findAll(ClassUser user) {
+    public List findAll(User user) {
         StringBuilder queryBuilder = new StringBuilder("SELECT p.*, u.name AS user_name FROM post p");
 
         if (user != null) {

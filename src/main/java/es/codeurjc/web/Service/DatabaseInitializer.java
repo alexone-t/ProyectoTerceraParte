@@ -1,16 +1,14 @@
 package es.codeurjc.web.Service;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 // import org.hibernate.engine.jdbc.BlobProxy;
+import es.codeurjc.web.Model.User;
+import es.codeurjc.web.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import es.codeurjc.web.Model.ClassUser;
 import es.codeurjc.web.Model.GroupClass;
 import es.codeurjc.web.Model.Post;
 import jakarta.annotation.PostConstruct;
@@ -24,23 +22,24 @@ public class DatabaseInitializer {
     @Autowired
     private PostService posts;
 
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostConstruct
     public void init()throws IOException{
-        //Create class users
-        ClassUser user1 = new ClassUser("Juan");
-        ClassUser user2 = new ClassUser("María");
-        ClassUser user3 = new ClassUser("Pedro");
-        users.save(user1);
-        users.save(user2);
-        users.save(user3);
+        users.save(new User("user1",passwordEncoder.encode("pass1"), "USER"));
+        users.save(new User("user2",passwordEncoder.encode("pass2"), "USER"));
+        users.save(new User("admin",passwordEncoder.encode("adminpass"), "USER","ADMIN"));
 
         //Create group class
-        GroupClass class1 = new GroupClass("Advanced yoga", "Monday", "10:00", "Professor A", 20,true);
-        GroupClass class2 = new GroupClass("Pilates", "Tuesday", "15:00", "Professor B", 15,true);
-        GroupClass class3 = new GroupClass("CrossFit", "Wednesday", "18:00", "Professor C", 25,true);
-        GroupClass class4 = new GroupClass("Zumba", "Thursday", "12:00", "Professor D", 30,true);
-        GroupClass class5 = new GroupClass("Spinning", "Friday", "17:00", "Professor E", 20,true);
-        GroupClass class6 = new GroupClass("Aerobics", "Saturday", "09:00", "Professor F", 25,true);
+        GroupClass class1 = new GroupClass("Advanced yoga", "Monday", "10:00", "Professor A", 20);
+        GroupClass class2 = new GroupClass("Pilates", "Tuesday", "15:00", "Professor B", 15);
+        GroupClass class3 = new GroupClass("CrossFit", "Wednesday", "18:00", "Professor C", 25);
+        GroupClass class4 = new GroupClass("Zumba", "Thursday", "12:00", "Professor D", 30);
+        GroupClass class5 = new GroupClass("Spinning", "Friday", "17:00", "Professor E", 20);
+        GroupClass class6 = new GroupClass("Aerobics", "Saturday", "09:00", "Professor F", 25);
         groupClass.save(class1);
         groupClass.save(class2);
         groupClass.save(class3);
@@ -69,40 +68,6 @@ public class DatabaseInitializer {
         posts.save(post5,null);
         posts.save(post6,null);
 
-        //Relate users to classes
-        user1.getListOfClasses().add(class1);
-        user1.getListOfClasses().add(class2);
-        user1.getListOfClasses().add(class3);
-        user1.getListOfPosts().add(post1);
-        user1.getListOfPosts().add(post2);
-        user1.getListOfPosts().add(post3);
 
-        user2.getListOfClasses().add(class2);
-        user2.getListOfClasses().add(class4);
-        user2.getListOfPosts().add(post4);
-
-        user3.getListOfClasses().add(class3);
-        user3.getListOfClasses().add(class5);
-        user3.getListOfPosts().add(post5);
-        user3.getListOfPosts().add(post6);
-
-    //Relate classes to users
-        class1.getClassUsers().add(user1);
-        class2.getClassUsers().add(user1);
-        class3.getClassUsers().add(user1);
-
-        class2.getClassUsers().add(user2);
-        class4.getClassUsers().add(user2);
-
-        class3.getClassUsers().add(user3);
-        class5.getClassUsers().add(user3);
-
-    //Relate posts to users
-        post1.setCreator(user1);
-        post2.setCreator(user1);
-        post3.setCreator(user1);
-        post4.setCreator(user2);
-        post5.setCreator(user3);
-        post6.setCreator(user3);
     }
 }

@@ -24,7 +24,7 @@ public class Post {
     public interface Creator{}
 
     @OneToOne@JsonView(Creator.class)
-    private ClassUser creator;
+    private User creator;
 
     public Post() {
 
@@ -32,12 +32,6 @@ public class Post {
 
     public Post(String title, String text) {
         super();
-        this.title = title;
-        this.text = text;
-    }
-    public Post(String creatorName, String title, String text){
-        super();
-        this.creator = new ClassUser(creatorName);
         this.title = title;
         this.text = text;
     }
@@ -66,8 +60,8 @@ public class Post {
     public void setText(String text) {
         this.text = text;
     }
-    public void setCreator(ClassUser creator){this.creator = creator;}
-    public ClassUser getCreator(){return this.creator;}
+    public void setCreator(User creator){this.creator = creator;}
+    public User getCreator(){return this.creator;}
     public void setCreatorName(String creatorName){this.creator.setName(creatorName);}
     public String getCreatorName(){return this.creator.getName();}
     public String getImage(){return this.image;}
