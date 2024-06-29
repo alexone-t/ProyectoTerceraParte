@@ -6,7 +6,13 @@
     <link rel="stylesheet" type="text/css" href="/css/join_class.css">
 </head>
 <body>
+{{^AlreadyJoined}}
 <h1>Are you sure you want to join this class:</h1>
+{{/AlreadyJoined}}
+
+{{#AlreadyJoined}}
+<h1>You've joined this class</h1>
+{{/AlreadyJoined}}
 <table border="0.5">
     <thead>
     <tr>
@@ -25,10 +31,12 @@
         <td>{{currentCapacity}}/{{maxCapacity}}</td>
     </tr>
     {{/GroupClass}}
+    {{^AlreadyJoined}}
     <form action="/GroupClasses/{{GroupClass.name}}/JoinClassConfirmation-{{id}}" method="post">
         <input type="hidden" name="userId" value="1">
         <button type="submit">Unirse a la Clase</button>
     </form>
+    {{/AlreadyJoined}}
     <button onclick="location.href='/GroupClasses/{{GroupClass.name}}'">Back</button>
 
     </tbody>

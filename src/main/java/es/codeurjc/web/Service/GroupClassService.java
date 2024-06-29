@@ -138,7 +138,14 @@ public class GroupClassService {
             groupClassRepository.save(groupClass);
         }
     }
+    public boolean alreadyJoined(Long userId, Long classId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
+        GroupClass groupClass = groupClassRepository.findById(classId)
+                .orElseThrow(() -> new ResourceNotFoundException("Clase de grupo no encontrada"));
+        return groupClass.getClassUsers().contains(user);
+    }
     public List<GroupClass> findByCriteria(Boolean official, String name, String time) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<GroupClass> query = cb.createQuery(GroupClass.class);
@@ -188,4 +195,5 @@ public class GroupClassService {
         return typedQuery.getResultList();
 
     }
+
 }

@@ -92,6 +92,7 @@ public class SecurityConfig {
 
                         // PRIVATE PAGES
                         .requestMatchers("/GroupClasses/*").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/GroupClasses/*/*").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/GroupClasses/*/JoinClass-*").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/GroupClasses/*/JoinClassConfirmation-*").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/GroupClasses/*/LeaveClass-*").hasAnyRole("USER","ADMIN")

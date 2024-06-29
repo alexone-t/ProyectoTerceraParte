@@ -53,8 +53,8 @@ public class User {
     public void setUserid(Long userid){this.userid = userid;}
 
 
-    public String getName(){return username;}
-    public void setName(String name){this.username = name;}
+    public String getName(){return name;}
+    public void setName(String name){this.name = name;}
     public String getUsername(){return this.username;}
     public void setUsername(String username){this.username = username;}
 

@@ -113,10 +113,16 @@ public class GroupClassWebController {
     }
 
     @GetMapping("/GroupClasses/{name}/JoinClass-{id}")
-    public String joinClass(Model model, @PathVariable Long id) {
+    public String joinClass(Model model, @PathVariable Long id,HttpServletRequest request) {
+
         Optional<GroupClass> optionalGroupClass = groupClassService.findById(id);
+
+        Principal principal = request.getUserPrincipal();
+        Long loggedInUserId = getUserIdFromPrincipal(principal);
+
         if (optionalGroupClass.isPresent()) {
             model.addAttribute("GroupClass", optionalGroupClass.get());
+            model.addAttribute("AlreadyJoined", groupClassService.alreadyJoined(loggedInUserId,id));
             return "joinClass";
         } else {
             return "index";
