@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/post_done.css">
+    <title>Leave Class</title>
+</head>
+<body>
+<div class="container">
+    <h1>Are you sure you want to leave this class?</h1>
+    <form action="/GroupClasses/{{Class.name}}/LeaveClass-{{id}}" method="post" enctype="multipart/form-data">
+     <div>
+         <input type="hidden" name="id" value="{{Class.classid}}">
+     </div>
+     <div>
+        <button type="submit">Sure</button>
+     </div>
+        <button onclick="location.href='/GroupClasses/{{Class.name}}';return false;">Back</button>
+    </form>
+</div>
+</body>
+</html>

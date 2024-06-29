@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Class</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/join_class.css">
+</head>
+<body>
+
+<h1>Classes of {{name}}: </h1>
+
+<form method="get" enctype="multipart/form-data">
+    <p><label>Select day: </label></p>
+    <select name="day">
+        <option value="Monday">Monday</option>
+        <option value="Tuesday">Tuesday</option>
+        <option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option>
+        <option value="Friday">Friday</option>
+        <option value="Saturday">Saturday</option>
+        <option value="Sunday">Sunday</option>
+        <option value="Any">Any</option>
+    </select>
+    <p><label>Instructor: </label></p>
+    <p><input name="instructor" placeholder="Instructor" value={{#groupclass.instructor}}{{groupclass.instructor}}{{/groupclass.instructor}}></input></p>
+    <input type='submit' value='Confirm'/>
+</form>
+<container>
+    <button onclick="window.location.href='/GroupClasses/find'" class="btn back-btn">Search</button>
+</container>
+
+    <table border="0.5">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Instructor</th>
+                <th>Capacity</th>
+            </tr>
+        </thead>
+        <tbody>
+        {{#GroupClass}}
+            <tr>
+                <td>{{day}}</td>
+                <td>{{Time}}</td>
+                <td>{{Instructor}}</td>
+                <td>{{currentCapacity}}/{{maxCapacity}}</td>
+                {{#isMaxCapacityReached}}
+                <td>Full</td>
+                {{/isMaxCapacityReached}}
+                {{^isMaxCapacityReached}}
+                    {{#alreadyJoined}}
+                        <td>Joined</td>
+                        <td><button onclick="location.href = '/GroupClasses/{{name}}/LeaveClass-{{id}}'">Leave</button></td>
+                    {{/alreadyJoined}}
+                    {{^alreadyJoined}}
+                        <td><button onclick="location.href = '/GroupClasses/{{name}}/JoinClass-{{id}}'">Join</button></td>
+                    {{/alreadyJoined}}
+                {{/isMaxCapacityReached}}
+
+            </tr>
+        {{/GroupClass}}
+        </tbody>
+    </table>
+
+
+    {{^GroupClass}}
+    <p>There are no available classes :(</p>
+    {{/GroupClass}}
+
+<button onclick="window.location.href='/'" class="btn back-btn">Back</button>
+
+{{#GroupClass}}
+{{^officialClass}}
+
+<button onclick="window.location.href='/GroupClasses/EditClass/{{classid}}'" class="btn edit-btn">Edit</button>
+
+<button onclick="window.location.href='/GroupClasses/DeleteClass/{{classid}}'" class="btn delete-btn">Delete</button>
+
+{{/officialClass}}
+{{/GroupClass}}
+</body>
+</html>

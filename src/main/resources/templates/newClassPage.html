@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>New Class</title>
+    <meta charset="UTF-8">
+    {{^edit}}
+    <link rel="stylesheet" type="text/css" href="css/write_post.css">
+    {{/edit}}
+    {{#edit}}
+    <link rel="stylesheet" type="text/css" href="css/write_post.css">
+    {{/edit}}
+
+
+</head>
+<body>
+<form method="post" enctype="multipart/form-data">
+
+    {{#error}}
+    <p class="error-message">{{error}}</p>
+    {{/error}}
+
+    <p><label>Class name: </label></p>
+    <p><input name="name" placeholder="Name" value={{#groupclass.name}}{{groupclass.name}}{{/groupclass.name}}></input></p>
+    <p><label>Day: </label></p>
+    <select name="day">
+        <option value="Monday">Monday</option>
+        <option value="Tuesday">Tuesday</option>
+        <option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option>
+        <option value="Friday">Friday</option>
+        <option value="Saturday">Saturday</option>
+        <option value="Sunday">Sunday</option>
+    </select>
+
+    <p>Time:</p>
+    <input type ='time' name='time' value="{{#groupclass.time}}{{groupclass.time}}{{/groupclass.time}}"/>
+
+    <p><label>Instructor: </label></p>
+    <p><input name="instructor" placeholder="Instructor" value={{#groupclass.instructor}}{{groupclass.instructor}}{{/groupclass.instructor}}></input></p>
+
+    <p><label>Max Capacity: </label></p>
+    <p><input name="maxCapacity" placeholder="Max Capacity" value="{{#groupclass.maxCapacity}}{{groupclass.maxCapacity}}{{/groupclass.maxCapacity}}" pattern="\d+" required title="Debes introducir un número"></input></p>
+
+    <input type='submit' value='Save'/>
+
+</form>
+
+<a href="/">Back</a>
+</body>
+</html>

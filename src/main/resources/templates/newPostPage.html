@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>New Post</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="css/write_post.css">
+	<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+</head>
+<body>
+	<form method="post" enctype="multipart/form-data">
+
+		{{#error}}
+		<p class="error-message">{{error}}</p>
+		{{/error}}
+
+		<p><label>User: </label></p>
+		<p><input name="user" placeholder="Name" value={{#post.creator.name}}{{post.creator.name}}{{/post.creator.name}}></input></p>
+
+		<p><label>Title: </label></p>
+		<p><input name="title" placeholder="Title" value='{{#post.title}}{{post.title}}{{/post.title}}'></input></p>
+
+		<p>Text:</p>
+		<div id="editor" style="height: 200px;">
+			{{#post.text}}{{post.text}}{{/post.text}}
+		</div>
+		<textarea id="description-textarea" name="text" rows="5" cols="40" style="display: none;">{{#post.text}}{{post.text}}{{/post.text}}</textarea>
+
+		<p>Image file:</p>
+		<input type='file' name='imagefile' accept=".jpg, .jpeg"/>
+
+		{{#edit}}
+
+		<label for="deleteImage">Delete Image</label>
+		<select id="deleteImage" name="deleteImage">
+			<option value="true">Yes</option>
+			<option value="false" selected>No</option>
+		</select>
+
+		{{/edit}}
+
+		<input type='submit' value='Save'/>
+
+	</form>
+
+	<a href="/blog">Back</a>
+
+	<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+	<script>
+		const quill = new Quill('#editor', {
+			theme: 'snow'
+		});
+		quill.on('text-change', function () {
+			document.getElementById('description-textarea').value = quill.root.innerHTML;
+		});
+	</script>
+
+</body>
+</html>
