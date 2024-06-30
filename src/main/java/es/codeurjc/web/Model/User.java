@@ -27,7 +27,7 @@ public class User {
 
 
     public interface Posts{}
-    @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER )
     @JsonView(Posts.class)
     private List<Post> listOfPosts = new ArrayList<>();
 

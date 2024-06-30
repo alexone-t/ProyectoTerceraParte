@@ -1,10 +1,11 @@
-/*package es.codeurjc.web.controller;
+package es.codeurjc.web.controller;
 import es.codeurjc.web.Model.User;
 import es.codeurjc.web.Model.Post;
 import es.codeurjc.web.Service.ImageService;
 import es.codeurjc.web.Service.PostService;
 import es.codeurjc.web.Service.UserService;
 import es.codeurjc.web.Service.ValidateService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -12,14 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -43,22 +42,40 @@ public class BlogWebController {
     private ValidateService validateService;
 
 
+    @ModelAttribute
+    public void addAttributes(Model model, HttpServletRequest request) {
+
+        Principal principal = request.getUserPrincipal();
+
+        if (principal != null) {
+
+            model.addAttribute("logged", true);
+            String name = principal.getName();
+            System.out.println(name);
+            Optional<User> userOptional = userService.findByUsername(name);
+            User user = userOptional.get();
+            model.addAttribute("user", user);
+            model.addAttribute("admin", request.isUserInRole("ADMIN"));
+
+        } else {
+            model.addAttribute("logged", false);
+        }
+    }
+
     @GetMapping("/blog")
-    public String showPosts(Model model){
+    public String showPosts(Model model) {
 
         model.addAttribute("Posts", postService.findAll());
 
         return "blog_index";
     }
+
     @GetMapping("/blog/{id}")
-    public String showPost(Model model, @PathVariable long id){
+    public String showPost(Model model, @PathVariable long id) {
 
         Optional<Post> post = postService.findById(id);
         if (post.isPresent()) {
-            //model.addAttribute("ImagePresented", imageService.getImage(validateService.validateImage()));
-            //model.addAttribute("ImagePresented", validateService.validateImage(imageService.getImage()));
-            //model.addAttribute("ImagePresented",post.get().imagePresent());
-            model.addAttribute("ImagePresented",post.get().getImage());
+            model.addAttribute("ImagePresented", post.get().getImage());
             model.addAttribute("Posts", post.get());
             model.addAttribute("CreatorName", post.get().getCreatorName());
             return "show_post";
@@ -67,68 +84,123 @@ public class BlogWebController {
         }
 
     }
+
     @GetMapping("/blog/new")
-    public String newPost(Model model){
+    public String newPost(Model model) {
         return "newPostPage";
     }
 
     @PostMapping("/blog/new")
-    public String newPostProcess(Model model, Post post, MultipartFile imagefile, String user) throws IOException {
+    public String newPostProcess(Model model, String title, String text, MultipartFile imagefile, HttpServletRequest request) throws IOException {
 
-        User classUser = new User(user);
-        post.setCreator(classUser);
+        title = validateService.cleanInput(title);
+        text = validateService.cleanInput(text);
 
-        if(validateService.validatePost(post) != null){
-            model.addAttribute("error",validateService.validatePost(post));
-            model.addAttribute("post",post);
-            return "newPostPage";
-        }else{
-            userService.addPost(post, classUser.getUserid()); //error newpost
-            classUser.addPost(post);
-            userService.save(classUser);
-            postService.save(post, imagefile);
+        Principal principal = request.getUserPrincipal();
+
+        if (principal == null) {
+            return "redirect:/login";
         }
+        Optional<User> user = userService.findByUsername(principal.getName());
+
+        Post post = new Post(title, text);
+
+        if (validateService.validatePost(post) != null) {
+            model.addAttribute("error", validateService.validatePost(post));
+            model.addAttribute("post", post);
+            return "newPostPage";
+        }
+
+        postService.addCreator(user.get().getUserid(), post.getId());
 
         return "redirect:/blog/" + post.getId();
     }
 
     @GetMapping("/blog/changePost/{id}")
-    public String editPost(Model model, @PathVariable("id") long id, MultipartFile imagefile) throws IOException {
+    public String editPost(Model model, @PathVariable("id") long id, MultipartFile imagefile, HttpServletRequest request) throws IOException {
+
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        String name = principal.getName();
+        Optional<User> userOptional = userService.findByUsername(name);
+        User user = userOptional.get();
 
         Post post = postService.findById(id).orElse(null);
 
-        model.addAttribute("post",post);
-        model.addAttribute("edit",true);
-        return "newPostPage";
+        String creatorName = postService.findById(id).get().getCreatorName();
+        Optional<User> userComment = userService.findByUsername(creatorName);
+        User userC = userComment.get();
+        if (userOptional.isPresent() && userComment.isPresent()
+                && (userService.isUser(id, userC.getUserid()) || request.isUserInRole("ADMIN"))) {
+            model.addAttribute("post", post);
+            model.addAttribute("edit", true);
+            return "newPostPage";
+        } else {
+            return "redirect:/blog";
+        }
 
 
     }
 
     @PostMapping("/blog/changePost/{id}")
-    public String editPostProcess(@PathVariable long id, Model model, Post post, MultipartFile imagefile,
-                                  String user,@RequestParam boolean deleteImage) throws IOException{
+    public String editPostProcess(@PathVariable long id, Model model, Post post, MultipartFile imagefile
+            , @RequestParam boolean deleteImage,HttpServletRequest request) throws IOException {
 
-        User classUser = new User(user);
-        post.setCreator(classUser);
-
-        if(validateService.validatePost(post) != null){
-            model.addAttribute("error",validateService.validatePost(post));
-            model.addAttribute("post",post);
-            return "newPostPage";
-        }else{
-            if(deleteImage){
-                postService.editPost(post,null,id);
-            }else{
-                postService.editPost(post,imagefile,id);
-            }
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return "redirect:/login";
         }
-        return "redirect:/blog/" + post.getId();
+        String name = principal.getName();
+        Optional<User> userOptional = userService.findByUsername(name);
+        User user = userOptional.get();
+
+        String creatorName = postService.findById(id).get().getCreatorName();
+        Optional<User> userComment = userService.findByUsername(creatorName);
+        User userC = userComment.get();
+        if (userOptional.isPresent() && userComment.isPresent()
+                && (userService.isUser(id, userC.getUserid()) || request.isUserInRole("ADMIN"))) {
+
+            if (validateService.validatePost(post) != null) {
+                model.addAttribute("error", validateService.validatePost(post));
+                model.addAttribute("post", post);
+                return "newPostPage";
+            } else {
+                if (deleteImage) {
+                    postService.editPost(post, null, id);
+                } else {
+                    postService.editPost(post, imagefile, id);
+                }
+            }
+            return "redirect:/blog/" + post.getId();
+        }
+        return "redirect:/blog/";
     }
 
     @GetMapping("/blog/deletePost/{id}")
-    public String deletePost(Model model,@PathVariable long id){
-        postService.delete(id);
-        return "deleted_post";
+    public String deletePost(Model model,@PathVariable long id,HttpServletRequest request){
+        Principal principal = request.getUserPrincipal();
+        if (principal == null) {
+            return "redirect:/login";
+        }
+        String name = principal.getName();
+        Optional<User> userOptional = userService.findByUsername(name);
+        User user = userOptional.get();
+
+        Post post = postService.findById(id).orElse(null);
+
+        String creatorName = postService.findById(id).get().getCreatorName();
+        Optional<User> userComment = userService.findByUsername(creatorName);
+        User userC = userComment.get();
+        if (userOptional.isPresent() && userComment.isPresent()
+                && (userService.isUser(id, userC.getUserid()) || request.isUserInRole("ADMIN"))) {
+            postService.delete(post.getId());
+            return "deleted_post";
+        } else {
+            return "redirect:/blog";
+        }
+
     }
     @GetMapping("/blog/{id}/image")
     public ResponseEntity<Resource> downloadImage(@PathVariable long id) throws SQLException {
@@ -145,4 +217,4 @@ public class BlogWebController {
     }
 
 
-}*/
+}

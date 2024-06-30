@@ -15,11 +15,5 @@ public interface GroupClassRepository extends JpaRepository <GroupClass, Long>{
     @NonNull
     <S extends GroupClass> List<S> findAll(@NonNull Example<S> example);
 
-    @Query("select g from GroupClass g where g.instructor = ?1")
-    List<GroupClass> findGroupClassByInstructor(String instructor);
-
-    @Query("select g from GroupClass g where g.day = ?1")
-    List<GroupClass> findGroupClassByDay(String day);
-
 
 }

@@ -29,9 +29,14 @@ public class DatabaseInitializer {
 
     @PostConstruct
     public void init()throws IOException{
-        users.save(new User("Manolo","user1",passwordEncoder.encode("pass1"), "USER"));
-        users.save(new User("Paco","user2",passwordEncoder.encode("pass2"), "USER"));
-        users.save(new User("Miguel","admin",passwordEncoder.encode("adminpass"), "USER","ADMIN"));
+
+        User user1 = new User("Manolo","user1",passwordEncoder.encode("pass1"), "USER");
+        User user2 = new User("Paco","user2",passwordEncoder.encode("pass2"), "USER");
+        User user3 = new User("Miguel","admin",passwordEncoder.encode("adminpass"), "USER","ADMIN");
+
+        users.save(user1);
+        users.save(user2);
+        users.save(user3);
 
         //Create group class
         GroupClass class1 = new GroupClass("Advanced yoga", "Monday", "10:00", "Professor A", 20);
@@ -52,21 +57,24 @@ public class DatabaseInitializer {
         Post post2 = new Post("Mi experience in the Pilates class", "Hello! Today I want to share my experience in yesterday's Pilates class. It was great!");
         Post post3 = new Post("Today's CrossFit trainning", "Hi guys! I just finished my CrossFit workout today and I'm completely exhausted but happy.");
         Post post4 = new Post("Zumba to stay in shape", "Hello everyone! I want to talk to you about my Zumba class today. It was a great way to stay fit and have fun!");
-        Post post5 = new Post("My thoughts  after Spinning", "Hello friends! After my Spinning class today, I feel incredibly energized and ready to take on any challenge.");
-        Post post6 = new Post("Benefits of Aerobics", "Good morning! Today I want to share with you some of the benefits of doing aerobics regularly. I hope you find it interesting!");
 
         post1.setImage("example1.jpeg");
         post2.setImage("example2.jpeg");
         post3.setImage("example3.jpeg");
         post4.setImage("example4.jpeg");
 
-
         posts.save(post1,null);
         posts.save(post2,null);
         posts.save(post3,null);
         posts.save(post4,null);
-        posts.save(post5,null);
-        posts.save(post6,null);
+
+        posts.addCreator(user1.getUserid(),post1.getId());
+        posts.addCreator(user2.getUserid(),post2.getId());
+ //       posts.addCreator(user2.getUserid(),post3.getId());
+  //      posts.addCreator(user3.getUserid(),post4.getId());
+
+
+
 
 
     }

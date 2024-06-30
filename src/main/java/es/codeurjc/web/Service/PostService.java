@@ -7,7 +7,9 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 import es.codeurjc.web.Model.User;
+import es.codeurjc.web.exceptions.ResourceNotFoundException;
 import es.codeurjc.web.repository.PostRepository;
+import es.codeurjc.web.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.hibernate.engine.jdbc.BlobProxy;
@@ -26,6 +28,10 @@ public class PostService {
 
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
 
     private AtomicLong nextId = new AtomicLong(1L);
 
@@ -83,7 +89,8 @@ public class PostService {
             post.setImage("no-image.png");
         }
 
-        post.setId(nextId.getAndIncrement());
+        long id = nextId.getAndIncrement();
+        post.setId(id);
         postRepository.save(post);
         return post;
     }
@@ -109,9 +116,25 @@ public class PostService {
 
     }
 
-    public Optional<Post> findByExample(Post postExample) {
-        Example<Post> example = Example.of(postExample);
-        return postRepository.findOne(example);
+    public void addCreator(Long postId, Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        if(post.getCreator()!=null){
+            if(user.getListOfPosts().contains(post)){
+                throw new IllegalArgumentException("El post ya le pertenece al usuario");
+            }
+        }
+
+        post.setCreator(user);
+        postRepository.save(post);
+
+        user.getListOfPosts().add(post);
+        userRepository.save(user);
+
+
+
     }
 
 }

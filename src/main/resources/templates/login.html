@@ -2,15 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <form action="/login" method="post">
-        <label>Username:</label><input type="text" name="username" /><br/>
-        <label>Password:</label><input type="password" name="password" /><br/>
-        <input type="submit" value="Sign In" />
-    </form>
-    <button onclick="location.href='/'">Back</button>
+    <link rel="stylesheet" href="/css/login.css">
 </head>
 <body>
+<header>
+    <h1>Welcome to the Login Page</h1>
+</header>
 
+<main>
+    <form action="/login" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required /><br/>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required /><br/>
+
+        <input type="submit" value="Sign In" />
+    </form>
+
+
+    <div style="text-align: center;">
+        <button style="border: none; outline: none; cursor: pointer; padding: 10px 20px; margin: 10px; font-size: 16px; text-align: center; text-decoration: none; transition: background-color 0.3s, color 0.3s; border-radius: 5px; background-color: #007bff; color: white;" onclick="location.href='/signup'">Sign Up</button>
+        <button style="border: none; outline: none; cursor: pointer; padding: 10px 20px; margin: 10px; font-size: 16px; text-align: center; text-decoration: none; transition: background-color 0.3s, color 0.3s; border-radius: 5px; background-color: #007bff; color: white;" onclick="location.href='/logout'">Logout</button>
+        <button style="border: none; outline: none; cursor: pointer; padding: 10px 20px; margin: 10px; font-size: 16px; text-align: center; text-decoration: none; transition: background-color 0.3s, color 0.3s; border-radius: 5px; background-color: #007bff; color: white;" onclick="location.href='/'">Back</button>
+    </div>
+</main>
+
+<footer>
+    <p>Â© 2024 Fokin Panza Gym - All rights reserved.</p>
+</footer>
 </body>
 </html>

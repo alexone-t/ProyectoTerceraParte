@@ -12,7 +12,7 @@ public class Post {
     public interface Basic{}
 
     @Id @JsonView(Basic.class)
-    private long id;
+    private Long id;
     @JsonView(Basic.class)
     private String title;
     @JsonView(Basic.class)

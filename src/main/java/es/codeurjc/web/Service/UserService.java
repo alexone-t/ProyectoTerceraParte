@@ -81,6 +81,10 @@ public class UserService {
         return user;
 
     }
+    public User updateUser(User user){
+        userRepository.save(user);
+        return user;
+    }
 
 
     public void delete(long id){
@@ -133,5 +137,6 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+    public boolean isUser(long id, long id2){return id==id2;}
 
 }
