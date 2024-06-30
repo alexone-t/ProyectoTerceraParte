@@ -1,0 +1,36 @@
+/* Tabla y estilos generales */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px auto;
+}
+
+/* Estilos para encabezados de tabla */
+thead th {
+    background-color: #333;
+    color: white;
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+/* Estilos para filas de tabla */
+tbody td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ddd;
+    background-color: rgb(241, 241, 241);
+}
+
+/* Estilos para botones habilitados */
+button {
+    color: black;
+    opacity: 0.6;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+}
+

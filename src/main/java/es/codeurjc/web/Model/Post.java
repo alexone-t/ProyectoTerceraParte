@@ -23,7 +23,7 @@ public class Post {
     private Blob imageFile;
     public interface Creator{}
 
-    @OneToOne@JsonView(Creator.class)
+    @ManyToOne@JsonView(Creator.class)
     private User creator;
 
     public Post() {
@@ -65,10 +65,10 @@ public class Post {
     public void setCreatorName(String creatorName){this.creator.setUsername(creatorName);}
     public String getCreatorName(){return this.creator.getUsername();}
     public String getImage(){return this.image;}
-
     public void setImage(String image){ this.image = image; }
     public Blob getImageFile(){return this.imageFile;}
     public void setImageFile(Blob imageFile){this.imageFile = imageFile;}
+    public boolean hasImage(){return this.image.equals("no-image.png");}
     @Override
     public String toString() {
         return "Post [id=" + id + ", title=" + title + ", text=" + text + "]";

@@ -14,6 +14,7 @@ public interface GroupClassRepository extends JpaRepository <GroupClass, Long>{
     @Override
     @NonNull
     <S extends GroupClass> List<S> findAll(@NonNull Example<S> example);
-
+    @Query("SELECT gc FROM GroupClass gc WHERE (:day IS NULL OR gc.day = :day) AND (:instructor IS NULL OR gc.instructor = :instructor)")
+    List<GroupClass> findDynamic(String day, String instructor);
 
 }

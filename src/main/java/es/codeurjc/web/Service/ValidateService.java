@@ -2,6 +2,7 @@ package es.codeurjc.web.Service;
 
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.jsoup.Jsoup;
@@ -11,7 +12,9 @@ import es.codeurjc.web.Model.*;
 @Service
 public class ValidateService {
 
-    //XSS protection implement with Jsoup
+    @Autowired
+    private UserService userService;
+
     public String cleanInput(String input){
         return Jsoup.clean(input, Safelist.relaxed());
     }
@@ -96,6 +99,21 @@ public class ValidateService {
         }
         return null;
     }
+    public String validateFirstName(String firstName){
+        if(firstName == null || firstName.isEmpty()){
+            return "Debes escribir tu nombre de usuario";
+        }
+        else if(firstName.length() > 25){
+            return "El nombre debe de tener mas de 25 caracteres";
+        }
+        return null;
+    }
+    public String validatePassword(String password){
+        if(password == null || password.isEmpty()){
+            return "La contraseña no debe ser vacia";
+        }
+        return null;
+    }
     public String validateTittle(String title){
         if(title == null || title.isEmpty()){
             return "Debes escribir un titulo, no puede estar vacio";
@@ -146,21 +164,35 @@ public class ValidateService {
     }
 
     public String validatePost(Post post){
-        String nameError = validateUsername(post.getCreatorName());
-        if (nameError != null){
-            return nameError;
-        }
-        String tittleError = validateTittle(post.getTitle());
+        String tittleError = validateTittle(cleanInput(post.getTitle()));
         if (tittleError != null){
             return tittleError;
         }
-        String textError = validateText(post.getText());
+        String textError = validateText(cleanInput(post.getText()));
         if (textError != null){
             return textError;
         }
         return null;
     }
+    public String validateUser(User user){
+        String userNameError = validateUsername(cleanInput(user.getUsername()));
+        if(userNameError!=null){
+            return userNameError;
+        }
+        String firstNameError = validateFirstName(cleanInput(user.getFirstName()));
+        if(firstNameError!=null){
+            return firstNameError;
+        }
+        String passwordError = validatePassword(cleanInput(user.getEncodedPassword()));
+        if(passwordError != null){
+            return passwordError;
+        }
+        if(userService.UserExist(user)){
+            return "There is already a user with the same username.";
+        }
+        return null;
 
+    }
     public boolean isValidFileName(String fileName) {
         return fileName != null && !fileName.isEmpty() && fileName.matches("[a-zA-Z0-9._-]+");
     }

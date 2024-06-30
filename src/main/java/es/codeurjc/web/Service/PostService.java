@@ -81,7 +81,6 @@ public class PostService {
 
         if (imageField != null && !imageField.isEmpty()) {
             post.setImage(imageField.getOriginalFilename());
-
             post.setImageFile(BlobProxy.generateProxy(imageField.getInputStream(), imageField.getSize()));
         }
 
@@ -96,7 +95,17 @@ public class PostService {
     }
 
     public void delete(long id){
-        postRepository.deleteById(id);
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post no encontrado"));
+
+        User creator = post.getCreator();
+        if (creator != null) {
+            creator.getListOfPosts().remove(post);
+            userRepository.save(creator);
+        }
+
+        postRepository.delete(post);
+
     }
 
     public void editPost(Post post, MultipartFile imageField, long id) throws IOException{
@@ -111,30 +120,26 @@ public class PostService {
             post.setImageFile(existingProduct.getImageFile());
             post.setImage(String.valueOf(existingProduct.getImage()));
         }
-
+        Post actualPost = postRepository.findById(id).orElseThrow();
+        post.setCreator(actualPost.getCreator());
         postRepository.save(post);
-
     }
 
-    public void addCreator(Long postId, Long userId){
+    public void addCreator(Long userId, Long postId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
-        if(post.getCreator()!=null){
-            if(user.getListOfPosts().contains(post)){
-                throw new IllegalArgumentException("El post ya le pertenece al usuario");
-            }
+                .orElseThrow(() -> new ResourceNotFoundException("Post no encontrado"));
+        if (post.getCreator() != null) {
+            throw new IllegalArgumentException("El post ya tiene un creador asignado");
         }
 
         post.setCreator(user);
-        postRepository.save(post);
-
         user.getListOfPosts().add(post);
+
+        postRepository.save(post);
         userRepository.save(user);
-
-
-
     }
 
 }

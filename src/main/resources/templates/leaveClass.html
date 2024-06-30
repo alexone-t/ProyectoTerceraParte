@@ -9,14 +9,14 @@
 <body>
 <div class="container">
     <h1>Are you sure you want to leave this class?</h1>
-    <form action="/GroupClasses/{{Class.name}}/LeaveClass-{{id}}" method="post" enctype="multipart/form-data">
+    <form action="/GroupClasses/{{GroupClass.name}}/LeaveClassConfirmation-{{id}}" method="post" enctype="multipart/form-data">
      <div>
-         <input type="hidden" name="id" value="{{Class.classid}}">
+         <input type="hidden" name="userId" value="{{user.userid}}">
      </div>
      <div>
         <button type="submit">Sure</button>
      </div>
-        <button onclick="location.href='/GroupClasses/{{Class.name}}';return false;">Back</button>
+        <button onclick="location.href='/GroupClasses/{{GroupClass.name}}';return false;">Back</button>
     </form>
 </div>
 </body>

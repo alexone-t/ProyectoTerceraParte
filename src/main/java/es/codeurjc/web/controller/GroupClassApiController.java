@@ -58,21 +58,21 @@ public class GroupClassApiController {
         }
     }
 
-    @JsonView(GroupClassDetails.class)
-    @GetMapping("/find")
-    public ResponseEntity<List<GroupClass>> dinamicQuerie(
-            @RequestParam(required = false) String day,
-            @RequestParam(required = false) String instructor
-    ) {
-        validateService.cleanInput(day);
-        validateService.cleanInput(instructor);
-        List<GroupClass> result = apiGroupClassService.dinamicQuerie(day, instructor);
-        if (result.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(result);
-        }
-    }
+//    @JsonView(GroupClassDetails.class)
+//    @GetMapping("/find")
+//    public ResponseEntity<List<GroupClass>> dinamicQuerie(
+//            @RequestParam(required = false) String day,
+//            @RequestParam(required = false) String instructor
+//    ) {
+//        validateService.cleanInput(day);
+//        validateService.cleanInput(instructor);
+//        List<GroupClass> result = apiGroupClassService.dinamicQuerie(day, instructor);
+//        if (result.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        } else {
+//            return ResponseEntity.ok(result);
+//        }
+//    }
 
     /////////////////GET(byId)/////////////////
 

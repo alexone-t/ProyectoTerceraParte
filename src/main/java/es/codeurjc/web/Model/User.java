@@ -19,11 +19,11 @@ public class User {
     @JsonView(Basic.class)
     private String username;
     @JsonView(Basic.class)
-    private String name;
+    private String firstName;
     @JsonIgnore
     private String encodedPassword;
     @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> roles;
+    private List<String> roles = new ArrayList<>();
 
 
     public interface Posts{}
@@ -39,8 +39,16 @@ public class User {
 
 
     public User(){}
-    public User(String username, String name,String encodedPassword, String... roles) {
-        this.name = name;
+    public User(String username, String firstName, String encodedPassword) {
+        this.firstName = firstName;
+        this.username = username;
+        this.encodedPassword = encodedPassword;
+        this.roles = new ArrayList<>();
+        this.listOfClasses = new ArrayList<>();
+        this.listOfPosts = new ArrayList<>();
+    }
+    public User(String username, String firstName, String encodedPassword, String... roles) {
+        this.firstName = firstName;
         this.username = username;
         this.encodedPassword = encodedPassword;
         this.roles = List.of(roles);
@@ -53,8 +61,8 @@ public class User {
     public void setUserid(Long userid){this.userid = userid;}
 
 
-    public String getName(){return name;}
-    public void setName(String name){this.name = name;}
+    public String getFirstName(){return firstName;}
+    public void setFirstName(String name){this.firstName = name;}
     public String getUsername(){return this.username;}
     public void setUsername(String username){this.username = username;}
 
@@ -67,7 +75,14 @@ public class User {
     public List<Post> getListOfPosts(){return this.listOfPosts;}
     public void setListOfPosts(List<Post>posts){this.listOfPosts = posts;}
 
-    public void addPost(Post post){this.listOfPosts.add(post);}
+    public void addPost(Post post){
+
+        if(!this.listOfPosts.contains(post)){
+            this.listOfPosts.add(post);
+            post.setCreator(this);
+        }
+
+    }
     public String getEncodedPassword() {
         return encodedPassword;
     }

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <title>Dinamic Query</title>
+  <link rel="stylesheet" type="text/css" href="/css/join_class.css">
+</head>
+<body>
+<h1>Options to join:</h1>
+{{#GroupClasses}}
+<h2>{{name}}</h2>
+<table border="0.5">
+  <thead>
+  <tr>
+    <th>Day</th>
+    <th>Time</th>
+    <th>Instructor</th>
+    <th>Capacity</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>{{day}}</td>
+    <td>{{Time}}</td>
+    <td>{{Instructor}}</td>
+    <td>{{currentCapacity}}/{{maxCapacity}}</td>
+  </tr>
+  </tbody>
+</table>
+<form action="/GroupClasses/{{name}}/JoinClass-{{id}}" method="post" enctype="multipart/form-data">
+  <h1>Enter username</h1>
+  <div>
+    <label>Username: </label>
+    <input name="username" placeholder="username" required="">
+  </div>
+  <div>
+    <input type="hidden" name="id" value="{{id}}">
+  </div>
+  <div>
+    <button type="submit">Join</button>
+  </div>
+</form>
+<button onclick="location.href='/GroupClasses/{{name}}';return false;">Back</button>
+{{/GroupClasses}}
+
+</body>
+</html>

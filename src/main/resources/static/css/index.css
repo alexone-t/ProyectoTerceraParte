@@ -98,7 +98,9 @@ a {
 a:hover {
     color: #0056b3;
 }
-
+.btn-group {
+    margin-top: 30px;
+}
 .btn {
     background-color: #03488f;
     color: white;

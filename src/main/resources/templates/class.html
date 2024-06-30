@@ -9,7 +9,7 @@
 
 <h1>Classes of {{name}}: </h1>
 <p>Find other class</p>
-<form method="get" enctype="multipart/form-data">
+<form action="/GroupClasses/find"method="get" enctype="multipart/form-data">
     <p><label>Select day: </label></p>
     <select name="day">
         <option value="Monday">Monday</option>
@@ -23,11 +23,10 @@
     </select>
     <p><label>Instructor: </label></p>
     <p><input name="instructor" placeholder="Instructor" value={{#groupclass.instructor}}{{groupclass.instructor}}{{/groupclass.instructor}}></input></p>
-    <input type='submit' value='Confirm'/>
+    <input type='submit' value='Search'/>
 </form>
-<container>
-    <button onclick="window.location.href='/GroupClasses/find'" class="btn back-btn">Search</button>
-</container>
+
+
 
     <table border="0.5">
         <thead>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de {{user.firstName}}</title>
+    <link rel="stylesheet" href="/css/privatepage.css">
+</head>
+<body>
+
+<header>
+    <h1>Welcome to your private page</h1>
+    <p id="username">Username: {{user.username}}</p>
+    <p id="name">Name: <span>{{user.firstName}}</span></p>
+</header>
+
+<main>
+    {{#success}}
+    <p>{{success}}</p>
+    {{/success}}
+    <section id="clases">
+        <h2>Your classes:</h2>
+        {{#groupClasses}}
+        <ul>
+            <li>{{name}}</li>
+            {{day}}, {{time}} - Instructor: {{instructor}}.
+        </ul>
+        {{/groupClasses}}
+    </section>
+
+    <section id="posts">
+        <h2>Your posts:</h2>
+        {{#posts}}
+        <div class="post">
+            <h3>{{title}}</h3>
+            <p>{{text}}</p>
+        </div>
+        {{/posts}}
+    </section>
+    <section>
+    <button onclick="location.href='/users/{{user.userid}}/delete'">Delete my account</button>
+    <button onclick="location.href='/users/{{user.userid}}/edit'">Edit my account</button>
+    <button onclick="location.href='/'">Back</button>
+    {{#isLoggedUser}}
+    <button onclick="location.href='/logout'">Logout</button>
+    {{/isLoggedUser}}
+    {{#admin}}
+    <button onclick="location.href='/users'">All the users</button>
+    {{/admin}}
+    </section>
+</main>
+
+<footer>
+    <p>© 2024 Fokin Panza Gym - All rights reserved.</p>
+</footer>
+
+</body>
+</html>

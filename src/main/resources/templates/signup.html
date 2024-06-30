@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+<header>
+    <h1>Welcome to the Sign Up Page</h1>
+</header>
+
+<main>
+    <form action="/signup" method="post" >
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required /><br/>
+
+        <label for="firstname">Name:</label>
+        <input type="text" id="firstName" name="firstName" required /><br/>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="encodedPassword" required /><br/>
+
+        <input type="submit" value="Sign Up" />
+    </form>
+
+    <div style="text-align: center;">
+        <button style="border: none; outline: none; cursor: pointer; padding: 10px 20px; margin: 10px; font-size: 16px; text-align: center; text-decoration: none; transition: background-color 0.3s, color 0.3s; border-radius: 5px; background-color: #007bff; color: white;" onclick="location.href='/login'">Login</button>
+        <button style="border: none; outline: none; cursor: pointer; padding: 10px 20px; margin: 10px; font-size: 16px; text-align: center; text-decoration: none; transition: background-color 0.3s, color 0.3s; border-radius: 5px; background-color: #007bff; color: white;" onclick="location.href='/'">Back</button>
+    </div>
+</main>
+
+<footer>
+    <p>Â© 2024 Fokin Panza Gym - All rights reserved.</p>
+</footer>
+</body>
+</html>

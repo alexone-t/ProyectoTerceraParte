@@ -1,38 +1,35 @@
-/*package es.codeurjc.web.controller;
+package es.codeurjc.web.controller;
+
 
 import com.fasterxml.jackson.annotation.JsonView;
-import es.codeurjc.web.Model.User;
 import es.codeurjc.web.Model.Post;
+import es.codeurjc.web.Model.User;
 import es.codeurjc.web.Service.ImageService;
 import es.codeurjc.web.Service.PostService;
 import es.codeurjc.web.Service.UserService;
 import es.codeurjc.web.Service.ValidateService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
-import org.springframework.core.io.Resource;
 import java.io.IOException;
 import java.net.URI;
 import java.sql.Blob;
-import java.util.*;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
 
 @RestController
 @RequestMapping("api/posts")
 public class BlogApiController {
-
-    //private static final Path IMAGES_FOLDER = Paths.get(System.getProperty("user.dir"), "images");
 
     @Autowired
     private PostService postService;
@@ -55,11 +52,7 @@ public class BlogApiController {
     @JsonView(PostsDetails.class)
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Post>> getPost(@PathVariable long id) {
-        Post postExample = new Post();
-        postExample.setId(id);
-
-        Optional<Post> post = postService.findByExample(postExample);
-
+        Optional<Post> post = postService.findById(id);
         if (post.isPresent()) {
             return ResponseEntity.ok(post);
         } else {
@@ -81,7 +74,7 @@ public class BlogApiController {
             response.put("post", post);
             return ResponseEntity.badRequest().body(response);
         } else {
-            userService.save(post.getCreator());
+            userService.saveUser(post.getCreator());
             postService.save(post, imageField);
             URI location = fromCurrentRequest().path("{id}").buildAndExpand(post.getId()).toUri();
             return ResponseEntity.created(location).body(post);
@@ -218,4 +211,4 @@ public class BlogApiController {
             return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
         }
     }
-}*/
+}

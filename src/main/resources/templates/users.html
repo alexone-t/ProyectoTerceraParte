@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users</title>
+    <link rel="stylesheet" href="/css/users.css">
+</head>
+<body>
+
+<section id="view">
+    <h2>Users</h2>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Username</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#users}}
+        <tr>
+            <td>{{username}}</td>
+            <td>
+                <button onclick="location.href='/users/{{userid}}'">View User</button>
+                <button onclick="location.href='/users/{{userid}}/delete'">Delete Account</button>
+                <button onclick="location.href='/users/{{userid}}/edit'">Edit Account</button>
+            </td>
+        </tr>
+        {{/users}}
+        </tbody>
+    </table>
+</section>
+
+
+
+</body>
+</html>

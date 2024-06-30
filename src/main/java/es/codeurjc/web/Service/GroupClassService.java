@@ -195,5 +195,10 @@ public class GroupClassService {
         return typedQuery.getResultList();
 
     }
+    public boolean isInClass(Long userId, Long classId){
+        Optional<User> user = userRepository.findById(userId);
+        Optional<GroupClass> groupclass = groupClassRepository.findById(classId);
+        return user.get().getListOfClasses().contains(groupclass.get());
+    }
 
 }

@@ -73,17 +73,34 @@ public class UserService {
     }
 
 
-    public User save(User user){
+    public User saveUser(User user){
 
         long id = nextId.getAndIncrement();
         user.setUserid(id);
+        user.setRoles(List.of("USER"));
         userRepository.save(user);
         return user;
 
     }
+    public User saveAdmin(User user){
+        long id = nextId.getAndIncrement();
+        user.setUserid(id);
+        user.setRoles(List.of("ADMIN","USER"));
+        userRepository.save(user);
+        return user;
+    }
     public User updateUser(User user){
         userRepository.save(user);
         return user;
+    }
+    public boolean isAdmin(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow();
+        return user.getRoles().contains("ADMIN");
+    }
+
+    public boolean isUser(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow();
+        return user.getRoles().contains("USER");
     }
 
 
@@ -135,6 +152,10 @@ public class UserService {
     }
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public boolean UserExist(User user){
+        return userRepository.findByUsername(user.getUsername()).isPresent();
     }
 
     public boolean isUser(long id, long id2){return id==id2;}

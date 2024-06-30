@@ -1,6 +1,8 @@
 package es.codeurjc.web.security;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import es.codeurjc.web.security.jwt.JwtRequestFilter;
+import es.codeurjc.web.security.jwt.UnauthorizedHandlerJwt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -21,7 +23,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-
+    @Autowired
+    private JwtRequestFilter jwtRequestFilter;
+    @Autowired
+    private UnauthorizedHandlerJwt unauthorizedHandlerJwt;
 
     @Autowired
     public RepositoryUserDetailsService userDetailService;
@@ -51,17 +56,37 @@ public class SecurityConfig {
         http.authenticationProvider(authenticationProvider());
 
         http
-                .securityMatcher("/api/**");
-                //.exceptionHandling(handling -> handling.authenticationEntryPoint(unauthorizedHandlerJwt));
+                .securityMatcher("/api/**")
+                .exceptionHandling(handling -> handling.authenticationEntryPoint(unauthorizedHandlerJwt));
 
         http
                 .authorizeHttpRequests(authorize -> authorize
                         // PRIVATE ENDPOINTS
-                        .requestMatchers(HttpMethod.POST,"/api/books/").hasRole("USER")
-                        .requestMatchers(HttpMethod.PUT,"/api/books/**").hasRole("USER")
-                        .requestMatchers(HttpMethod.DELETE,"/api/books/**").hasRole("ADMIN")
-                        // PUBLIC ENDPOINTS
-                        .anyRequest().permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/posts/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.POST,"/api/posts/*/image").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/posts/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/posts/*/image").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.PUT,"/api/posts/**").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.GET,"/api/posts/*/image").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/posts/**").permitAll()
+
+                        .requestMatchers(HttpMethod.POST,"/api/groupClasses/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/groupClasses/*/image").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.DELETE,"/api/groupClasses/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/groupClasses/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/groupClasses/type/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/groupClasses/**").permitAll()
+
+                        .requestMatchers(HttpMethod.POST,"/api/auth/login").anonymous()
+                        .requestMatchers(HttpMethod.POST,"/api/auth/logout").authenticated()
+                        .requestMatchers(HttpMethod.POST,"/api/users/signup").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/users/**").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.PUT,"/api/users/**").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.GET,"/api/users/me").authenticated()
+                        .requestMatchers(HttpMethod.POST,"/api/auth/refresh").authenticated()
+                        .requestMatchers(HttpMethod.DELETE,"/api/users/**").hasAnyRole("ADMIN","USER")
+                        .requestMatchers(HttpMethod.POST,"/api/users/**").authenticated()
                 );
 
         // Disable Form login Authentication
@@ -77,7 +102,7 @@ public class SecurityConfig {
         http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         // Add JWT Token filter
-      //  http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -92,11 +117,13 @@ public class SecurityConfig {
 
                         // PRIVATE PAGES
                         .requestMatchers("/GroupClasses/*").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/GroupClasses/find").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/GroupClasses/*/*").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/GroupClasses/*/JoinClass-*").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/GroupClasses/*/JoinClassConfirmation-*").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/GroupClasses/*/LeaveClass-*").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/GroupClasses/*/LeaveClassConfirmation-*").hasAnyRole("USER","ADMIN")
+                        .requestMatchers("/blog/*").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/blog/new").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/blog/changePost/*").hasAnyRole("USER","ADMIN")
                         .requestMatchers("/blog/deletePost/*").hasAnyRole("USER","ADMIN")
@@ -117,11 +144,6 @@ public class SecurityConfig {
                         .requestMatchers("/signup").permitAll()
                         .requestMatchers("/loginerror").permitAll()
                         .requestMatchers("/").permitAll()
-                        //
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/h2-console/login.do?jsessionid=*").permitAll()
-                        .requestMatchers("/h2-console/header.jsp*").permitAll()
-                        .requestMatchers("/h2-console/tables.do*").permitAll()
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
@@ -135,8 +157,7 @@ public class SecurityConfig {
                         .permitAll()
                 );
 
-        http.csrf(csrf -> csrf.disable());
-
+        //http.csrf(csrf -> csrf.disable());
         return http.build();
     }
 

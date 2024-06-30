@@ -27,7 +27,25 @@ public class GroupClassWebController {
     private UserService userService;
     @Autowired
     private ValidateService validateService;
+    @ModelAttribute
+    public void addAttributes(Model model, HttpServletRequest request) {
 
+        Principal principal = request.getUserPrincipal();
+
+        if (principal != null) {
+
+            model.addAttribute("logged", true);
+            String name = principal.getName();
+            System.out.println(name);
+            Optional<User> userOptional = userService.findByUsername(name);
+            User user = userOptional.get();
+            model.addAttribute("user", user);
+            model.addAttribute("admin", request.isUserInRole("ADMIN"));
+
+        } else {
+            model.addAttribute("logged", false);
+        }
+    }
     @GetMapping("/")
     public String showGroupClasses(Model model) {
         model.addAttribute("GroupClasses", groupClassService.findAllForIndex(null, null));
@@ -60,11 +78,15 @@ public class GroupClassWebController {
     }
 
     @GetMapping("/GroupClasses/{name}/{id}")
-    public String showClass(Model model, @PathVariable String name, @PathVariable long id) {
+    public String showClass(Model model, @PathVariable String name, @PathVariable long id,HttpServletRequest request) {
+
+        Principal principal = request.getUserPrincipal();
+        Long loggedInUserId = getUserIdFromPrincipal(principal);
         Optional<GroupClass> optionalGroupClass = groupClassService.findById(id);
         if (optionalGroupClass.isPresent()) {
             GroupClass groupClass = optionalGroupClass.get();
             model.addAttribute("GroupClass", groupClass);
+            model.addAttribute("alreadyJoined",groupClassService.alreadyJoined(loggedInUserId,id));
             return "class";
         } else {
             return "index";
@@ -153,8 +175,13 @@ public class GroupClassWebController {
     }
 
     @GetMapping("/GroupClasses/{name}/LeaveClass-{id}")
-    public String leaveClass(Model model, @PathVariable Long id) {
+    public String leaveClass(Model model, @PathVariable Long id,HttpServletRequest request) {
+
         Optional<GroupClass> optionalGroupClass = groupClassService.findById(id);
+
+        Principal principal = request.getUserPrincipal();
+        Long loggedInUserId = getUserIdFromPrincipal(principal);
+
         if (optionalGroupClass.isPresent()) {
             model.addAttribute("GroupClass", optionalGroupClass.get());
             return "leaveClass";
@@ -164,18 +191,18 @@ public class GroupClassWebController {
     }
 
     @PostMapping("/GroupClasses/{name}/LeaveClassConfirmation-{id}")
-    public String leaveClassProcess(Model model, @PathVariable String name, @PathVariable Long id, @RequestParam Long userId, Principal principal )throws IOException {
+    public String leaveClassProcess(Model model, @PathVariable String name, @PathVariable Long id, @RequestParam Long userId, HttpServletRequest request)throws IOException {
 
         name = validateService.cleanInput(name);
-
+        Principal principal = request.getUserPrincipal();
         if (principal == null) {
-            //throw new UnauthorizedException("El usuario no está autenticado");
+            return "redirect:/login";
         }
 
         Long loggedInUserId = getUserIdFromPrincipal(principal);
 
         if (!loggedInUserId.equals(userId)) {
-            //throw new UnauthorizedException("No tienes permiso para salir de esta clase");
+            return "redirect:/login";
         }
 
         Optional<GroupClass> groupClassOpt = groupClassService.findById(id);
@@ -183,40 +210,30 @@ public class GroupClassWebController {
             throw new ResourceNotFoundException("Clase no encontrada");
         }
 
-        groupClassService.joinClass(userId,id);
-        return "redirect:/GroupClasses/{name}";
+        if(groupClassService.isInClass(loggedInUserId,id)){
+            groupClassService.leaveClass(loggedInUserId,id);
+            return "redirect:/GroupClasses/{name}/{id}";
+        }
+        return "redirect:/";
     }
 
-    @GetMapping("/GroupClasses/find")
-    public String searchClass(Model model, @RequestParam(required = false) String day, @RequestParam(required = false) String instructor){
-
-        model.addAttribute("GroupClass", groupClassService.dinamicQuerie(day,instructor));
-
-        return "class";
-    }
     private Long getUserIdFromPrincipal(Principal principal) {
 
         Optional <User> user = userService.findByUsername(principal.getName());
 
         return user.get().getUserid();
     }
-    @ModelAttribute
-    public void addAttributes(Model model, HttpServletRequest request) {
 
-        Principal principal = request.getUserPrincipal();
+//    public String searchClass(Model model, @RequestParam(required = false) String day, @RequestParam(required = false) String instructor){
+//        List<GroupClass> groupClasses = groupClassService.dinamicQuerie(day, instructor);
+//        model.addAttribute("GroupClasses", groupClasses);
+//        return "dinamicQuery";
+//    }
+@GetMapping("/GroupClasses/find")
+public String searchClass(Model model, @RequestParam(required = false) String day, @RequestParam(required = false) String instructor){
+    List<GroupClass> groupClasses = groupClassService.dinamicQuerie(day, instructor);
+    model.addAttribute("GroupClasses", groupClasses);
+    return "dinamicQuery";
+}
 
-        if (principal != null) {
-
-            model.addAttribute("logged", true);
-            String name = principal.getName();
-            System.out.println(name);
-            Optional<User> userOptional = userService.findByUsername(name);
-            User user = userOptional.get();
-            model.addAttribute("user", user);
-            model.addAttribute("admin", request.isUserInRole("ADMIN"));
-
-        } else {
-            model.addAttribute("logged", false);
-        }
-    }
 }

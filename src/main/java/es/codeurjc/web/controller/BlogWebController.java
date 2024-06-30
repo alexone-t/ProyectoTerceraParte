@@ -1,4 +1,5 @@
 package es.codeurjc.web.controller;
+import es.codeurjc.web.Model.GroupClass;
 import es.codeurjc.web.Model.User;
 import es.codeurjc.web.Model.Post;
 import es.codeurjc.web.Service.ImageService;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -71,20 +73,33 @@ public class BlogWebController {
     }
 
     @GetMapping("/blog/{id}")
-    public String showPost(Model model, @PathVariable long id) {
+    public String showPost(Model model, @PathVariable long id, HttpServletRequest request) {
+
+        Principal principal = request.getUserPrincipal();
 
         Optional<Post> post = postService.findById(id);
-        if (post.isPresent()) {
-            model.addAttribute("ImagePresented", post.get().getImage());
-            model.addAttribute("Posts", post.get());
-            model.addAttribute("CreatorName", post.get().getCreatorName());
-            return "show_post";
-        } else {
-            return "blog_index";
+
+        if (principal != null) {
+            String name = principal.getName();
+            Optional<User> userOptionalLogged = userService.findByUsername(name);
+            if (userOptionalLogged.isPresent()) {
+                User userLogged = userOptionalLogged.get();
+                model.addAttribute("ImagePresented", post.get().getImage());
+                model.addAttribute("Posts", post.get());
+                model.addAttribute("CreatorName", post.get().getCreatorName());
+                if ((post.get().getCreator().equals(userLogged)|| request.isUserInRole("ADMIN"))) {
+                    Optional<User> userOptional = userService.findById(id);
+                    if (userOptional.isPresent()) {
+                        User user = userOptional.get();
+                        model.addAttribute("iscreator", user);
+                    }
+
+                }
+                return "show_Post";
+            }
         }
-
+        return "redirect:/login";
     }
-
     @GetMapping("/blog/new")
     public String newPost(Model model) {
         return "newPostPage";
@@ -111,7 +126,10 @@ public class BlogWebController {
             return "newPostPage";
         }
 
-        postService.addCreator(user.get().getUserid(), post.getId());
+        postService.save(post,imagefile);
+        postService.addCreator(user.get().getUserid(),post.getId());
+
+
 
         return "redirect:/blog/" + post.getId();
     }
@@ -193,6 +211,7 @@ public class BlogWebController {
         String creatorName = postService.findById(id).get().getCreatorName();
         Optional<User> userComment = userService.findByUsername(creatorName);
         User userC = userComment.get();
+
         if (userOptional.isPresent() && userComment.isPresent()
                 && (userService.isUser(id, userC.getUserid()) || request.isUserInRole("ADMIN"))) {
             postService.delete(post.getId());

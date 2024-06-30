@@ -28,15 +28,15 @@ public class DatabaseInitializer {
     private PasswordEncoder passwordEncoder;
 
     @PostConstruct
-    public void init()throws IOException{
+    public void init() throws IOException, InterruptedException {
 
-        User user1 = new User("Manolo","user1",passwordEncoder.encode("pass1"), "USER");
-        User user2 = new User("Paco","user2",passwordEncoder.encode("pass2"), "USER");
-        User user3 = new User("Miguel","admin",passwordEncoder.encode("adminpass"), "USER","ADMIN");
+        User user1 = new User("user1","Pedro",passwordEncoder.encode("pass1"), "USER");
+        User user2 = new User("user2","Manolo",passwordEncoder.encode("pass2"), "USER");
+        User user3 = new User("admin","Miguel",passwordEncoder.encode("adminpass"), "USER","ADMIN");
 
-        users.save(user1);
-        users.save(user2);
-        users.save(user3);
+        users.saveUser(user1);
+        users.saveUser(user2);
+        users.saveAdmin(user3);
 
         //Create group class
         GroupClass class1 = new GroupClass("Advanced yoga", "Monday", "10:00", "Professor A", 20);
@@ -70,11 +70,8 @@ public class DatabaseInitializer {
 
         posts.addCreator(user1.getUserid(),post1.getId());
         posts.addCreator(user2.getUserid(),post2.getId());
- //       posts.addCreator(user2.getUserid(),post3.getId());
-  //      posts.addCreator(user3.getUserid(),post4.getId());
-
-
-
+        posts.addCreator(user2.getUserid(),post3.getId());
+        posts.addCreator(user3.getUserid(),post4.getId());
 
 
     }

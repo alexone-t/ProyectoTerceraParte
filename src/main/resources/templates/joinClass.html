@@ -33,8 +33,13 @@
     {{/GroupClass}}
     {{^AlreadyJoined}}
     <form action="/GroupClasses/{{GroupClass.name}}/JoinClassConfirmation-{{id}}" method="post">
-        <input type="hidden" name="userId" value="1">
+        <input type="hidden" name="userId" value={{user.userid}}>
         <button type="submit">Unirse a la Clase</button>
+    </form>
+    {{/AlreadyJoined}}
+    {{#AlreadyJoined}}
+    <form action="/GroupClasses/{{GroupClass.name}}/LeaveClass-{{id}}" method="get">
+        <button type="submit"style="background-color: red; color: white;">Desapuntarse</button>
     </form>
     {{/AlreadyJoined}}
     <button onclick="location.href='/GroupClasses/{{GroupClass.name}}'">Back</button>
